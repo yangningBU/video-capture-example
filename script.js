@@ -14,41 +14,6 @@ $(document).ready(function() {
   var $resumeButton = $('#resume');
   var $stopButton = $('#stop');
 
-  function updateStatus() {
-    var $cameraStatus = $('#camera-status');
-    var $recorderStatus = $('#recorder-status');
-
-    var isCameraActive = !!stream;
-    $cameraStatus.html("Camera is " + (isCameraActive ? 'active' : 'inactive') + '.');
-    $cameraStatus.css("color", isCameraActive ? 'green' : 'black');
-
-    var state = recorder ? recorder.state : 'inactive';
-    var color = (function() {
-      switch(state) {
-        case 'recording':
-          return 'green';
-        case 'paused':
-          return 'orange';
-        case 'stopped':
-          return 'red';
-        default:
-          return 'black';
-      }
-    })();
-
-
-    $recorderStatus.html('Recorder is ' + state + '.');
-    $recorderStatus.css('color', color);
-  }
-
-  function updatePreview(mediaStream) {
-    var video = $('#preview')[0];
-    video.srcObject = mediaStream;
-    video.onloadedmetadata = function(e) {
-      video.play();
-    };
-  }
-
   function enableCameraButtons() {
     $activateButton.prop('disabled', true);
     $deactivateButton.prop('disabled', false);
@@ -69,6 +34,42 @@ $(document).ready(function() {
     $stopButton.prop('disabled', true);
   }
 
+  function getColorFromState(state) {
+    switch(state) {
+      case 'recording':
+        return 'green';
+      case 'paused':
+        return 'orange';
+      case 'stopped':
+        return 'red';
+      default:
+        return 'black';
+    }
+  }
+
+  function updateStatus() {
+    var $cameraStatus = $('#camera-status');
+    var $recorderStatus = $('#recorder-status');
+
+    var isCameraActive = !!stream;
+    $cameraStatus.html("Camera is " + (isCameraActive ? 'active' : 'inactive') + '.');
+    $cameraStatus.css("color", isCameraActive ? 'green' : 'black');
+
+    var state = recorder ? recorder.state : 'inactive';
+    var color = getColorFromState(state);
+
+    $recorderStatus.html('Recorder is ' + state + '.');
+    $recorderStatus.css('color', color);
+  }
+
+  function updatePreview(blob) {
+    if (blob) {
+      var video = $('#preview')[0];
+      video.src = URL.createObjectURL(blob);
+      video.play();
+    }
+  }
+
   function enableCamera() {
     navigator.mediaDevices.getUserMedia({ video: true }).then(function(mediaStream){
       // Initialize stream and recorder objects
@@ -76,7 +77,8 @@ $(document).ready(function() {
 
       recorder = RecordRTC(stream, {
         type: 'video',
-        mimeType: 'video/mp4;codecs=h264'
+        mimeType: 'video/webm',
+        disableLogs: true
       });
 
       // Enable buttons
@@ -85,18 +87,15 @@ $(document).ready(function() {
       // Bind event handlers
       recorder.onStateChanged = function(state) {
         updateStatus();
+        updatePreview(this.getBlob());
       };
 
-      $startButton.on('click', function() {
-        recorder.startRecording(function(){ 
-          updateStatus();
-          updatePreview();
-        });
-      })
+      $startButton.on('click', function() { recorder.startRecording() });
+      $pauseButton.on('click', function() { recorder.pauseRecording() });
+      $resumeButton.on('click', function() { recorder.resumeRecording() });
 
       $stopButton.on('click', function() {
         recorder.stopRecording(function() {
-          updateStatus();
           var raw = this.getBlob();
           var blob = new Blob([raw], { type: 'video/webm' });
           var filename = (
@@ -104,16 +103,9 @@ $(document).ready(function() {
             (new Date()).toJSON().replace(/:/g,'-') +
             '.webm'
           );
-
+          updatePreview(raw);
           FileSaver.saveAs(blob, filename);
         });
-      })
-
-      $pauseButton.on('click', function() {
-        recorder.pauseRecording(function(){ updateStatus() });
-      })
-      $resumeButton.on('click', function() {
-        recorder.resumeRecording(function(){ updateStatus() });
       })
 
       updateStatus();
