@@ -1,5 +1,5 @@
 # Video Capturing Example
-This was to prototype a featuer to capture survey results from Deaf participants 
+This was to prototype a feature to capture survey results from Deaf participants 
 who wished to submit responses in ASL.
 
 ### System Dependencies
@@ -10,6 +10,7 @@ who wished to submit responses in ASL.
 ### Installation for Mac
 - I assume you already have [brew](https://brew.sh) installed
 - Get `node` and `browserify` installed
+
 For a fresh installation:
 ```
 brew install node
@@ -27,7 +28,7 @@ npm upgrade -g npm
 
 Once that's set make sure you have browserify to handle all of the imports:
 ```
-npm install -g browerify
+npm install -g browserify
 ```
 
 ### Running the app
@@ -41,5 +42,5 @@ Then turn on the server:
 node server.js
 ```
 
-The application will run on localhost:8000
+The application will run on http://localhost:8000
 
