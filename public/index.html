@@ -1,0 +1,75 @@
+<html>
+	<head>
+    <title>Recording Example</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    />
+    <style type="text/css">
+      /* -- General -- */
+      body {
+        padding-top: 1em;
+      }
+      button {
+        border: 1px solid gray;
+        border-radius: 1em;
+      }
+      button[disabled="true"] {
+        border: 1px solid lightgray;
+      }
+      button:hover {
+        cursor: pointer;
+      }
+      /* -- Specific -- */
+      #preview {
+        border: 1px solid black;
+      }
+      #video-controls {
+        max-width: 600px;
+      }
+      #video-controls > div {
+        margin-top: 1em;
+        padding: 1em;
+      }
+      #controls {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+    </style>
+	</head>
+	<body>
+    <div class="container" id="content">
+  		<h1>Please record your response.</h1>
+
+      <div>
+        <button id="activate">Activate Camera</button>
+        <button id="deactivate" disabled="true">Turn off Camera</button>
+      </div>
+      <br/>
+
+      <h5 id="camera-status">Camera is inactive.</h5>
+      <h5 id="recorder-status">Recorder is inactive.</h5>
+     
+      <hr/>
+
+      <div class="row" id="video-controls">
+        <div class="col" id="video-container">
+          <video id="preview" controls autoplay></video>
+        </div>
+
+        <div class="col" id="controls">
+          <p><button id="start" disabled="true">Start New Recording</button></p>
+          <p>
+            <button id="pause" disabled="true">Pause</button>
+            <button id="resume" disabled="true">Resume</button>
+          </p>
+          <p><button id="stop" disabled="true">Stop Recording</button></p>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript" src="/bundle.js"></script>
+  </body>
+</html>

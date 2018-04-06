@@ -1,0 +1,8 @@
+# I'm on a Mac
+.DS_Store
+
+# Dependency Den
+node_modules
+
+# Build files
+/public/bundle.js
