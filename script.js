@@ -5,6 +5,7 @@ var $ = require("jquery");
 $(document).ready(function() {
   var recorder = null;
   var stream = null;
+  var video = $('video#preview')[0];
 
   var $activateButton = $('#activate');
   var $deactivateButton = $('#deactivate');
@@ -28,10 +29,10 @@ $(document).ready(function() {
     $activateButton.prop('disabled', false);
     $deactivateButton.prop('disabled', true);
 
-    $startButton.prop('disabled', true);
-    $pauseButton.prop('disabled', true);
-    $resumeButton.prop('disabled', true);
-    $stopButton.prop('disabled', true);
+    $startButton.prop('disabled', true).off('click');
+    $pauseButton.prop('disabled', true).off('click');
+    $resumeButton.prop('disabled', true).off('click');
+    $stopButton.prop('disabled', true).off('click');
   }
 
   function getColorFromState(state) {
@@ -64,22 +65,49 @@ $(document).ready(function() {
 
   function updatePreview(blob) {
     if (blob) {
-      var video = $('#preview')[0];
+      hideLivePreview()
       video.src = URL.createObjectURL(blob);
       video.play();
     }
   }
 
+  function turnOffDevices() {
+    stream.getTracks().forEach(function(track) {
+      track.stop();
+    });
+  }
+
+  function disableCamera() {
+    disabledCameraButtons();
+    turnOffDevices();
+
+    stream = null;
+    recorder = null;
+
+    updateStatus();
+  }
+
+  function showLivePreview() {
+    video.controls = false;
+    video.srcObject = stream;
+  }
+
+  function hideLivePreview() {
+    video.controls = true;
+    video.srcObject = null;
+  }
+
   function enableCamera() {
     navigator.mediaDevices.getUserMedia({ video: true }).then(function(mediaStream){
       // Initialize stream and recorder objects
-      stream = mediaStream;
-
+      stream   = mediaStream;
       recorder = RecordRTC(stream, {
         type: 'video',
         mimeType: 'video/webm',
         disableLogs: true
       });
+
+      showLivePreview();
 
       // Enable buttons
       enableCameraButtons();
@@ -87,11 +115,16 @@ $(document).ready(function() {
       // Bind event handlers
       recorder.onStateChanged = function(state) {
         updateStatus();
-        updatePreview(this.getBlob());
       };
 
-      $startButton.on('click', function() { recorder.startRecording() });
+      $startButton.on('click', function() { 
+        recorder.clearRecordedData();
+        showLivePreview();
+        recorder.startRecording();
+      });
+      
       $pauseButton.on('click', function() { recorder.pauseRecording() });
+      
       $resumeButton.on('click', function() { recorder.resumeRecording() });
 
       $stopButton.on('click', function() {
@@ -108,24 +141,12 @@ $(document).ready(function() {
         });
       })
 
+      // Update HTML Labels
       updateStatus();
 
     }).catch(function(error) {
-      console.log("Getting User Media stream failed.", error);
+      console.debug("Getting User Media stream failed. Perhaps user declined permission.", error);
     })
-  }
-
-  function disableCamera() {
-    disabledCameraButtons();
-
-    stream.getTracks().forEach(function(track) {
-      track.stop();
-    });
-
-    stream = null;
-    recorder = null;
-
-    updateStatus();
   }
 
   $activateButton.on('click', enableCamera);
