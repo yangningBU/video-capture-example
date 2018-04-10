@@ -42,7 +42,14 @@ Then turn on the server:
 node server.js
 ```
 
-The application will run on http://localhost:8000
+Which can all be done in one step with:
+```
+npm start
+```
+
+But the build step will have to be re-run on each change to the script file.
+
+The application will run on http://localhost:8888
 
 ### File Conversion
 This downloads files as .webm. I use [ffmpeg](https://www.ffmpeg.org/documentation.html) to convert these into H264 mp4 files.
