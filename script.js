@@ -1,8 +1,16 @@
-var RecordRTC = require('recordrtc');
-var FileSaver = require('file-saver');
-var $ = require("jquery");
+'use strict';
 
-$(document).ready(function() {
+(function(){
+  /*
+  * Import Dependencies
+  */
+  var RecordRTC = require('recordrtc');
+  var FileSaver = require('file-saver');
+  var $ = require("jquery");
+
+  /*
+  * Instantiate Camera and State Elements
+  */
   var recorder = null;
   var stream = null;
   var video = $('video#preview')[0];
@@ -97,58 +105,64 @@ $(document).ready(function() {
     video.srcObject = null;
   }
 
-  function enableCamera() {
-    navigator.mediaDevices.getUserMedia({ video: true }).then(function(mediaStream){
-      // Initialize stream and recorder objects
-      stream   = mediaStream;
-      recorder = RecordRTC(stream, {
-        type: 'video',
-        mimeType: 'video/webm',
-        disableLogs: true
-      });
+  function setupCapture() {
+    
 
-      showLivePreview();
-
-      // Enable buttons
-      enableCameraButtons();
-
-      // Bind event handlers
-      recorder.onStateChanged = function(state) {
-        updateStatus();
-      };
-
-      $startButton.on('click', function() { 
-        recorder.clearRecordedData();
-        showLivePreview();
-        recorder.startRecording();
-      });
-      
-      $pauseButton.on('click', function() { recorder.pauseRecording() });
-      
-      $resumeButton.on('click', function() { recorder.resumeRecording() });
-
-      $stopButton.on('click', function() {
-        recorder.stopRecording(function() {
-          var raw = this.getBlob();
-          var blob = new Blob([raw], { type: 'video/webm' });
-          var filename = (
-            '_recorded_HTML_video_' +
-            (new Date()).toJSON().replace(/:/g,'-') +
-            '.webm'
-          );
-          updatePreview(raw);
-          FileSaver.saveAs(blob, filename);
+    function enableCamera() {
+      navigator.mediaDevices.getUserMedia({ video: true }).then(function(mediaStream){
+        // Initialize stream and recorder objects
+        stream   = mediaStream;
+        recorder = RecordRTC(stream, {
+          type: 'video',
+          mimeType: 'video/webm',
+          disableLogs: true
         });
+
+        showLivePreview();
+
+        // Enable buttons
+        enableCameraButtons();
+
+        // Bind event handlers
+        recorder.onStateChanged = function(state) {
+          updateStatus();
+        };
+
+        $startButton.on('click', function() { 
+          recorder.clearRecordedData();
+          showLivePreview();
+          recorder.startRecording();
+        });
+        
+        $pauseButton.on('click', function() { recorder.pauseRecording() });
+        
+        $resumeButton.on('click', function() { recorder.resumeRecording() });
+
+        $stopButton.on('click', function() {
+          recorder.stopRecording(function() {
+            var raw = this.getBlob();
+            var blob = new Blob([raw], { type: 'video/webm' });
+            var filename = (
+              '_recorded_HTML_video_' +
+              (new Date()).toJSON().replace(/:/g,'-') +
+              '.webm'
+            );
+            updatePreview(raw);
+            FileSaver.saveAs(blob, filename);
+          });
+        })
+
+        // Update HTML Labels
+        updateStatus();
+
+      }).catch(function(error) {
+        console.debug("Getting User Media stream failed. Perhaps user declined permission.", error);
       })
+    }
 
-      // Update HTML Labels
-      updateStatus();
-
-    }).catch(function(error) {
-      console.debug("Getting User Media stream failed. Perhaps user declined permission.", error);
-    })
+    $activateButton.on('click', enableCamera);
+    $deactivateButton.on('click', disableCamera);
   }
 
-  $activateButton.on('click', enableCamera);
-  $deactivateButton.on('click', disableCamera);
-})
+  $(document).ready(setupCapture)
+}());

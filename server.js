@@ -1,10 +1,11 @@
 var express = require('express')
 var app = express();
 var path = require('path');
+
 const port = 8888;
 
 app.listen(port, function () {
-  console.log(`Example app listening on port ${port}!`);
+  console.log(`Video capture app listening on port ${port}!`);
 })
 
 app.use(express.static('public'))

@@ -8,46 +8,18 @@ who wished to submit responses in ASL.
 - browserify 16.1.1
 
 ### Installation for Mac
-- I assume you already have [brew](https://brew.sh) installed
-- Get `node` and `browserify` installed
 
-For a fresh installation:
 ```
-brew install node
-```
-
-If you already have node / npm but they're too old:
-```
-brew upgrade node
-```
-
-You can upgrade npm as well after upgrading node with:
-```
-npm upgrade -g npm
-```
-
-Once that's set make sure you have browserify to handle all of the imports:
-```
-npm install -g browserify
+npm install
 ```
 
 ### Running the app
-Compile the build script file:
-```
-npm run-script build
-```
 
-Then turn on the server:
-```
-node server.js
-```
-
-Which can all be done in one step with:
 ```
 npm start
 ```
 
-But the build step will have to be re-run on each change to the script file.
+If you make file changes you will have to rebuild and serve.
 
 The application will run on http://localhost:8888
 
