@@ -27,7 +27,7 @@ The application will run on http://localhost:8888
 This downloads files as .webm. I use [ffmpeg](https://www.ffmpeg.org/documentation.html) to convert these into H264 mp4 files.
 You can install it with brew:
 ```
-brew install ffmpeg --with-libvpx --with-libvorbis
+brew install libvpx libvorbis ffmpeg
 ```
 
 And to convert the .webm files to .mp4 using the H264 codec:
